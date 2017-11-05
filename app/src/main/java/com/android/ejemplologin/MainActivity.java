@@ -1,6 +1,8 @@
 package com.android.ejemplologin;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -30,6 +32,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 //Aqui empieza el cliente http
+                final ProgressDialog barprog = new ProgressDialog(MainActivity.this);
+                barprog.setCancelable(false);
+                barprog.setMessage("Cargando...");
+                barprog.setMax(100);
+                barprog.setProgress(0);
+                barprog.show();
                 AsyncHttpClient cliente = new AsyncHttpClient();
                 RequestParams datos = new RequestParams();
                 datos.put("usuario",user.getText().toString());
@@ -42,12 +50,20 @@ public class MainActivity extends AppCompatActivity {
                             String respuesta = new String(responseBody);
                             if("correcto".equals(respuesta))
                             {
+                                barprog.dismiss();
+                                Toast.makeText(getApplicationContext(),"Datos correctos.",Toast.LENGTH_LONG).show();
                                 startActivity(new Intent(MainActivity.this,Main2Activity.class));
                                 finish();
                             }
                             else if("incorrecto".equals(respuesta))
                             {
-                                Toast.makeText(getApplicationContext(),"Usuario y/o contraseña incorrecto",Toast.LENGTH_LONG).show();
+                                barprog.dismiss();
+                                Toast.makeText(getApplicationContext(),"Usuario y/o contraseña incorrecto.",Toast.LENGTH_LONG).show();
+                            }
+                            else
+                            {
+                                Toast.makeText(getApplicationContext(),"Error en el servidor.",Toast.LENGTH_LONG).show();
+                                barprog.dismiss();
                             }
                         }
                         else
